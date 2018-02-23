@@ -24,6 +24,10 @@ public class GameController : MonoBehaviour {
 			lastSpawnTime = Time.time;
 
 			TapTarget nextTarget = Instantiate (TapTargetPrefab, nextSpawnPosition, Quaternion.identity).GetComponent<TapTarget>();
+//			nextTarget.gameObject.GetComponent<SpriteRenderer> ().sortingLayerName = "Targets";
+//			foreach (SpriteRenderer spriteRenderer in nextTarget.gameObject.GetComponentsInChildren<SpriteRenderer>()) {
+//				spriteRenderer.sortingLayerName = "Targets";
+//			}
 			nextTarget.decaySpeed = Random.Range (0.2f, 2f);
 			nextSpawnPosition = new Vector3 (Random.Range (-6f, 7f), Random.Range (-2.5f, 4f), 1f);
 		}

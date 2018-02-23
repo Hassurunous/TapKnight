@@ -18,7 +18,7 @@ TagManager:
   - Midground
   - Foreground
   - Characters
-  - 
+  - Targets
   - 
   - 
   - 
@@ -44,4 +44,13 @@ TagManager:
     locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Enemy
+    uniqueID: 2726336373
+    locked: 0
+  - name: Player
+    uniqueID: 3112420535
+    locked: 0
+  - name: Targets
+    uniqueID: 4261710997
     locked: 0
