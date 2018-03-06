@@ -43,6 +43,8 @@ public class TapTarget : MonoBehaviour {
 			RaycastHit2D raycastHit = Physics2D.Raycast (Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
 			if (raycastHit) {
 				if (raycastHit.collider.CompareTag("TapTarget")) {
+					Debug.Log("Tapped the target!");
+					Debug.Log("Accuracy = " + Accuracy());
 				}
 			}
 		}
@@ -63,5 +65,13 @@ public class TapTarget : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		delayTime = 0.1f / decaySpeed;
+	}
+
+	float Accuracy() {
+		if (timerRingScale >= 1.75) {
+			return 0.0f;
+		} else {
+			return 100.0f / Mathf.Pow (2, timerRingScale - 1);
+		}
 	}
 }
