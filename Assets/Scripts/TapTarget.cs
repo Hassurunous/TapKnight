@@ -35,30 +35,8 @@ public class TapTarget : MonoBehaviour {
 			alignTime = Time.time;
 			aligned = true;
 		} else if (aligned && Time.time >= alignTime + delayTime) {
-			Destroy (this.gameObject);
+			GameController.TargetOutcome(this, false);
 		}
-
-		#if UNITY_EDITOR && !UNITY_IOS
-		if (Input.GetButtonDown("Fire1")) {
-			RaycastHit2D raycastHit = Physics2D.Raycast (Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-			if (raycastHit) {
-				if (raycastHit.collider.CompareTag("TapTarget")) {
-					Debug.Log("Tapped the target!");
-					Debug.Log("Accuracy = " + Accuracy());
-				}
-			}
-		}
-
-		#elif UNITY_IOS
-		if ((Input.touchCount > 0) && (Input.GetTouch(0).phase == TouchPhase.Began)) {
-			RaycastHit2D raycastHit = Physics2D.Raycast (Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position), Vector2.zero);
-			if (raycastHit) {
-				if (raycastHit.collider.CompareTag("TapTarget")) {
-				}
-			}
-		}
-
-		#endif
 
 	}
 
@@ -67,11 +45,19 @@ public class TapTarget : MonoBehaviour {
 		delayTime = 0.1f / decaySpeed;
 	}
 
-	float Accuracy() {
-		if (timerRingScale >= 1.75) {
-			return 0.0f;
+	void Awake() {
+	}
+
+	public int Accuracy(bool hit) {
+		Kill ();
+		if (hit) {
+			return (int) (100.0f / Mathf.Pow (2, timerRingScale - 1));
 		} else {
-			return 100.0f / Mathf.Pow (2, timerRingScale - 1);
+			return 0;
 		}
+	}
+
+	void Kill() {
+		Destroy (this.gameObject);
 	}
 }
