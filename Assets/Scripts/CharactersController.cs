@@ -19,24 +19,10 @@ public class CharactersController : MonoBehaviour {
 	// we can run tests on these. Later, we'll use these to create several character objects
 	// using this controller component by simply passing in a sprite and animator controller.
 	[SerializeField]
-	Sprite sprite {
-		get {
-			return sprite;
-		}
-		set {
-			spriteRenderer.sprite = value;
-		}
-	}
+	Sprite sprite;
 
 	[SerializeField]
-	RuntimeAnimatorController animatorController {
-		get {
-			return animatorController;
-		}
-		set {
-			animator.runtimeAnimatorController = value;
-		}
-	}
+	RuntimeAnimatorController animatorController;
 
 	// Private variables so other classes can't directly update the values here
 	// but public getters so that other classes can check them.
@@ -136,8 +122,10 @@ public class CharactersController : MonoBehaviour {
 
 	// Set up the component given the values provided for sprite and animatorController
 	void Setup() {
-		animatorController = animatorController;
-		sprite = sprite;
+//		animatorController = animatorController;
+//		sprite = sprite;
+		spriteRenderer.sprite = sprite;
+		animator.runtimeAnimatorController = animatorController;
 	}
 		
 
