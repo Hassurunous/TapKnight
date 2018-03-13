@@ -22,7 +22,7 @@ public class TapTarget : MonoBehaviour {
 	// We want to delay slightly after the rings align to destroy the ring to give users a bit of a chance to get the 100% click
 	bool aligned = false;
 	float alignTime = 0.0f;
-	float delayTime;
+	public float delayTime;
 
 	void Update()
 	{
@@ -35,14 +35,13 @@ public class TapTarget : MonoBehaviour {
 			alignTime = Time.time;
 			aligned = true;
 		} else if (aligned && Time.time >= alignTime + delayTime) {
-			GameController.TargetOutcome(this, false);
+			CombatController.instance.TargetOutcome(this, false);
 		}
 
 	}
 
 	// Use this for initialization
 	void Start () {
-		delayTime = 0.1f / decaySpeed;
 	}
 
 	void Awake() {
