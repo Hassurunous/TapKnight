@@ -5,10 +5,18 @@ using UnityEngine;
 public class CombatController : MonoBehaviour {
 
 	// Store for spawning TapTargets
-	public GameObject TapTargetPrefab;
+	[SerializeField]
+	GameObject TapTargetPrefab;
 
 	// Store for Accuracy Indicator prefab
-	public GameObject AccuracyIndicatorPrefab;
+	[SerializeField]
+	GameObject AccuracyIndicatorPrefab;
+
+	[SerializeField]
+	GameObject gameOverScreen;
+
+	[SerializeField]
+	GameObject winScreen;
 
 	// Keep track of the active target
 	TapTarget activeTarget;
@@ -80,7 +88,7 @@ public class CombatController : MonoBehaviour {
 
 	void DisplayCharacters() {
 
-		Debug.Log ("Spawning: " + CharacterManager.instance.GetCharacterByName ("knight1"));
+//		Debug.Log ("Spawning: " + CharacterManager.instance.GetCharacterByName ("knight1"));
 
 		GameObject player = Instantiate(CharacterManager.instance.GetCharacterByName("knight1"), playerCharacterObject.transform);
 
@@ -142,12 +150,14 @@ public class CombatController : MonoBehaviour {
 			#endif
 		} else if (currState == CombatState.Victory || currState == CombatState.Defeat) {
 			if (activeTarget != null) {
-				Destroy (activeTarget);
+				Destroy (activeTarget.gameObject);
 			}
 			if (currState == CombatState.Victory) {
 				// Hooray! You won! Do things.
+				winScreen.SetActive(true);
 			} else {
 				// Darn! You lost! Do things.
+				gameOverScreen.SetActive(true);
 			}
 		} else {
 			// We're in the ready state. Wait for input.
@@ -167,28 +177,20 @@ public class CombatController : MonoBehaviour {
 
 		// Then run animations and other functions based on that accuracy.
 		if (accuracy >= 95) {
-			Debug.Log ("Perfect!");
-			enemyCharacter.TakeDamage (playerCharacter.attackPower * 2);
+			enemyCharacter.TakeDamage (false, (int)(playerCharacter.attackPower * 1.5));
 			playerCharacter.Attack (attackSpeedMod);
 		} else if (accuracy >= 85) {
-			enemyCharacter.TakeDamage (playerCharacter.attackPower);
-
+			enemyCharacter.TakeDamage (false, (int)playerCharacter.attackPower);
 			playerCharacter.Attack (attackSpeedMod);
-			Debug.Log ("Great!");
 		} else if (accuracy >= 75) {
-			enemyCharacter.TakeDamage ((int)(playerCharacter.attackPower / 2.0f));
+			enemyCharacter.TakeDamage (false, (int)(playerCharacter.attackPower / 2.0f));
 			playerCharacter.Attack (attackSpeedMod);
-			Debug.Log ("Good!");
 		} else if (accuracy >= 65) {
-//			enemyCharacter.TakeDamage ((int)(playerCharacter.attackPower / 2.0f));
-//			playerCharacter.TakeDamage ((int)(enemyCharacter.attackPower / 2.0f));
-			enemyCharacter.AttackAndHurt(attackSpeedMod);
-			enemyCharacter.AttackAndHurt(attackSpeedMod);
-			Debug.Log ("Close!");
+			playerCharacter.TakeDamage (true, (int)(enemyCharacter.attackPower / 2.0f), attackSpeedMod);
+			enemyCharacter.TakeDamage (true, (int)(playerCharacter.attackPower / 2.0f), attackSpeedMod);
 		} else {
-			playerCharacter.TakeDamage (enemyCharacter.attackPower);
+			playerCharacter.TakeDamage (false, enemyCharacter.attackPower);
 			enemyCharacter.Attack (attackSpeedMod);
-			Debug.Log ("Ouch!");
 		}
 	}
 

@@ -86,7 +86,26 @@ public class Character : MonoBehaviour {
 
 	// Call this method when the character takes some damage. 
 	// If the damage exceeds their armor, deal that much damage, otherwise deal 1 damage. Return how much damage was dealt.
-	public int TakeDamage(int damage) {
+	public void Hurt() {
+		animator.SetTrigger ("takeDamage");
+		animator.SetInteger ("currentHP", _hitpoints);
+	}
+
+	// Call this method when the character successfully attacks without taking damage.
+	public void Attack(float attackSpeed) {
+		animator.SetFloat ("attackSpeed", attackSpeed);
+		animator.SetTrigger ("attack");
+	}
+
+	// Call this method when the character takes AND receives damage
+	public void AttackAndHurt(float attackSpeed) {
+		animator.SetFloat ("attackSpeed", attackSpeed);
+		animator.SetTrigger ("attack");
+		animator.SetTrigger ("badAttack");
+	}
+
+	// Update the current hit points based on the amount of damage dealt
+	public void TakeDamage(bool attackToo, int damage, float attackSpeed = 1.0f) {
 		int damageDealt = 0;
 		if (damage > armor) {
 			damageDealt = damage - armor;
@@ -94,52 +113,13 @@ public class Character : MonoBehaviour {
 			damageDealt = 1;
 		}
 		_hitpoints = _hitpoints - damageDealt > 0 ? _hitpoints - damageDealt : 0;
-		animator.SetTrigger ("takeDamage");
-		animator.SetInteger ("currentHP", _hitpoints);
-		return damageDealt;
+		if (attackToo) {
+			AttackAndHurt (attackSpeed);
+		} else {
+			Hurt ();
+		}
 	}
-
-	// Call this method when the character successfully attacks without taking damage.
-	public void Attack(float attackSpeed) {
-		Debug.Log ("attackSpeed = " + attackSpeed);
-		animator.SetFloat ("attackSpeed", attackSpeed);
-		animator.SetTrigger ("attack");
-	}
-
-	// Call this method when the character takes AND receives damage
-	public void AttackAndHurt(float attackSpeed) {
-		Debug.Log ("attackSpeed = " + attackSpeed);
-		animator.SetFloat ("attackSpeed", attackSpeed);
-		animator.SetTrigger ("attack");
-		animator.SetTrigger ("badAttack");
-	}
-
-
-	// Call this method to update persistent values of a character (i.e. attackPower, HP, or Armor)
-	// Pass in the name of the property you are updating and the new value
-//	public void UpdateProps<T>(string propName, T newData) {
-//		switch (propName) {
-//		case "armor":
-//			UpdateArmor ((int)newData);
-//			break;
-//		case "attack":
-//			UpdateAttack ((int)newData);
-//			break;
-//		case "hp":
-//			UpdateMaxHP ((int)newData);
-//			break;
-//		case "sprite":
-//			UpdateSprite ((Sprite)newData);
-//			break;
-//		case "anim":
-//			UpdateAnimatorController ((AnimatorController)newData);
-//			break;
-//		default:
-//			Debug.Log ("Inappropriate propName for updateProps. Exiting without update.");
-//			break;
-//		}
-//	}
-
+		
 	// Call this method to update armor value of the character
 	public void UpdateArmor(int newArmor) {
 		_armor = newArmor;
@@ -187,7 +167,7 @@ public class Character : MonoBehaviour {
 		
 		
 	void Awake() {
-		Debug.Log ("Character wakeup. Character name = " + _name);
+//		Debug.Log ("Character wakeup. Character name = " + _name);
 	}
 
 	// Use this for initialization
