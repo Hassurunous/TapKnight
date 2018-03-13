@@ -13,10 +13,13 @@ public class CombatController : MonoBehaviour {
 	GameObject AccuracyIndicatorPrefab;
 
 	[SerializeField]
-	GameObject gameOverScreen;
+	GameObject loseScreen;
 
 	[SerializeField]
 	GameObject winScreen;
+
+	[SerializeField]
+	GameObject readyScreen;
 
 	// Keep track of the active target
 	TapTarget activeTarget;
@@ -87,7 +90,6 @@ public class CombatController : MonoBehaviour {
 	}
 
 	void DisplayCharacters() {
-
 //		Debug.Log ("Spawning: " + CharacterManager.instance.GetCharacterByName ("knight1"));
 
 		GameObject player = Instantiate(CharacterManager.instance.GetCharacterByName("knight1"), playerCharacterObject.transform);
@@ -95,25 +97,43 @@ public class CombatController : MonoBehaviour {
 		GameObject enemy = Instantiate(CharacterManager.instance.GetCharacterByName("ork1"), enemyCharacterObject.transform);
 
 		playerCharacter = player.GetComponent<Character> ();
+		playerCharacter.Setup ();
 		enemyCharacter = enemy.GetComponent<Character> ();
-
-	}
-
-	void ConfigureCharacters(Character player, Character enemy) {
-		playerCharacter = player;
-		enemyCharacter = enemy;
+		enemyCharacter.Setup ();
 	}
 
 	// Currently, the only thing to do is start spawning targets. 
 	void Start () {
+	}
 
+	void StartCombat() {
+		readyScreen.SetActive (false);
 		currState = CombatState.Active;
 		DisplayCharacters ();
 
 		nextSpawnDelay = Random.Range (1f / Mathf.Pow(2f, difficultyModifier), 5f / Mathf.Pow(2f, difficultyModifier));
 		nextSpawnPosition = new Vector3 (Random.Range (-6f, 7f), Random.Range (-2.5f, 4.25f), 1f);
+	}
 
+	void ClearCombatants() {
+		if (playerCharacter) {
+			Destroy (playerCharacter.gameObject);
+		}
+		if (enemyCharacter) {
+			Destroy (enemyCharacter.gameObject);
+		}
+	}
 
+	public void ReadyOrRetry() {
+		ClearUI ();
+		ClearCombatants ();
+		StartCombat ();
+	}
+
+	void ClearUI() {
+		winScreen.SetActive (false);
+		loseScreen.SetActive (false);
+		readyScreen.SetActive (false);
 	}
 
 	// 
@@ -157,10 +177,11 @@ public class CombatController : MonoBehaviour {
 				winScreen.SetActive(true);
 			} else {
 				// Darn! You lost! Do things.
-				gameOverScreen.SetActive(true);
+				loseScreen.SetActive(true);
 			}
 		} else {
 			// We're in the ready state. Wait for input.
+
 		}
 	}
 
