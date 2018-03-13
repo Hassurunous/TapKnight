@@ -88,7 +88,6 @@ public class Character : MonoBehaviour {
 	// If the damage exceeds their armor, deal that much damage, otherwise deal 1 damage. Return how much damage was dealt.
 	public void Hurt() {
 		animator.SetTrigger ("takeDamage");
-		animator.SetInteger ("currentHP", _hitpoints);
 	}
 
 	// Call this method when the character successfully attacks without taking damage.
@@ -112,7 +111,9 @@ public class Character : MonoBehaviour {
 		} else {
 			damageDealt = 1;
 		}
-		_hitpoints = _hitpoints - damageDealt > 0 ? _hitpoints - damageDealt : 0;
+		int newHitpoints = _hitpoints - damageDealt > 0 ? _hitpoints - damageDealt : 0;
+		_hitpoints = newHitpoints;
+		animator.SetInteger ("currentHP", newHitpoints);
 		if (attackToo) {
 			AttackAndHurt (attackSpeed);
 		} else {
@@ -162,7 +163,8 @@ public class Character : MonoBehaviour {
 	}
 
 	// Set up the component given the values provided for sprite and animatorController
-	void Setup() {
+	public void Setup() {
+		animator.SetInteger ("currentHP", _hitpointsMax);
 	}
 		
 		
