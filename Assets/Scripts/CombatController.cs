@@ -10,6 +10,9 @@ public class CombatController : MonoBehaviour {
 	// Store for Accuracy Indicator prefab
 	public GameObject AccuracyIndicatorPrefab;
 
+	// Keep track of the active target
+	TapTarget activeTarget;
+
 	// Keep track of the last time we spawned a target
 	float lastSpawnTime = 0.0f;
 
@@ -23,7 +26,7 @@ public class CombatController : MonoBehaviour {
 	public float difficultyModifier = 0f;
 
 	// This controls how fast the next target is. It is calculated in update for each target.
-	float nextTargetDecaySpeedMod = 0f;
+	float activeTargetDecaySpeedMod = 1f;
 
 	// Conditional statement in Update() checks time, so we'll store it in order to keep from needing to call it more than once. 
 	float currTime;
@@ -125,18 +128,29 @@ public class CombatController : MonoBehaviour {
 				}
 			}
 
-			#elif UNITY_IOS
+			#elif UNITY_IOS || UNITY_ANDROID
 			if ((Input.touchCount > 0) && (Input.GetTouch(0).phase == TouchPhase.Began)) {
 				RaycastHit2D raycastHit = Physics2D.Raycast (Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position), Vector2.zero);
 				if (raycastHit) {
 					if (raycastHit.collider.CompareTag("TapTarget")) {
 						TapTarget targetHit = raycastHit.collider.GetComponent<TapTarget>();
-						UpdateScore(targetHit);
+						TargetOutcome (targetHit, true);
 					}
 				}
 			}
 
 			#endif
+		} else if (currState == CombatState.Victory || currState == CombatState.Defeat) {
+			if (activeTarget != null) {
+				Destroy (activeTarget);
+			}
+			if (currState == CombatState.Victory) {
+				// Hooray! You won! Do things.
+			} else {
+				// Darn! You lost! Do things.
+			}
+		} else {
+			// We're in the ready state. Wait for input.
 		}
 	}
 
@@ -148,25 +162,40 @@ public class CombatController : MonoBehaviour {
 		GameObject accuracyIndicatorScript = Instantiate(AccuracyIndicatorPrefab, target.transform.position, Quaternion.identity);
 		accuracyIndicatorScript.GetComponent<AccuracyIndicator> ().SpawnSetup (accuracy, destructDelay);
 
+		// Get the modifier for calculating animation speed.
+		float attackSpeedMod = activeTargetDecaySpeedMod + 1 < 3 ? activeTargetDecaySpeedMod + 1 : 3;
+
 		// Then run animations and other functions based on that accuracy.
 		if (accuracy >= 95) {
 			Debug.Log ("Perfect!");
+			enemyCharacter.TakeDamage (playerCharacter.attackPower * 2);
+			playerCharacter.Attack (attackSpeedMod);
 		} else if (accuracy >= 85) {
+			enemyCharacter.TakeDamage (playerCharacter.attackPower);
+
+			playerCharacter.Attack (attackSpeedMod);
 			Debug.Log ("Great!");
 		} else if (accuracy >= 75) {
+			enemyCharacter.TakeDamage ((int)(playerCharacter.attackPower / 2.0f));
+			playerCharacter.Attack (attackSpeedMod);
 			Debug.Log ("Good!");
 		} else if (accuracy >= 65) {
+//			enemyCharacter.TakeDamage ((int)(playerCharacter.attackPower / 2.0f));
+//			playerCharacter.TakeDamage ((int)(enemyCharacter.attackPower / 2.0f));
+			enemyCharacter.AttackAndHurt(attackSpeedMod);
+			enemyCharacter.AttackAndHurt(attackSpeedMod);
 			Debug.Log ("Close!");
 		} else {
+			playerCharacter.TakeDamage (enemyCharacter.attackPower);
+			enemyCharacter.Attack (attackSpeedMod);
 			Debug.Log ("Ouch!");
 		}
-
 	}
 
 
 	void SpawnTarget(float nowtime) {
 		// Scaling the decay speed logarithmically. Quick start to the curve, and a trailing increase that stays sane. 
-		nextTargetDecaySpeedMod = Mathf.Log(difficultyModifier + 1, 4);
+		activeTargetDecaySpeedMod = Mathf.Log(difficultyModifier + 1, 4);
 
 		// Update lastSpawnTime to match the currently spawning target
 		lastSpawnTime = nowtime;
@@ -175,16 +204,16 @@ public class CombatController : MonoBehaviour {
 		nextSpawnPosition = new Vector3 (Random.Range (-6f, 7f), Random.Range (-2.5f, 4f), 1f);
 
 		// Instantiate a new target at the given location and get a reference to its TapTarget component
-		TapTarget nextTarget = Instantiate (TapTargetPrefab, nextSpawnPosition, Quaternion.identity).GetComponent<TapTarget>();
+		activeTarget = Instantiate (TapTargetPrefab, nextSpawnPosition, Quaternion.identity).GetComponent<TapTarget>();
 
 		// Set the speed of the new target
-		nextTarget.decaySpeed = Random.Range (nextTargetDecaySpeedMod + 0.5f, nextTargetDecaySpeedMod + 1.2f);
+		activeTarget.decaySpeed = Random.Range (activeTargetDecaySpeedMod + 0.5f, activeTargetDecaySpeedMod + 1.2f);
 
 		// Set the length of the pause on overlap before destruction.
-		nextTarget.delayTime = 0.05f / nextTarget.decaySpeed;
+		activeTarget.delayTime = 0.05f / activeTarget.decaySpeed;
 
 		// As decaySpeed scales upward, the lifetime of a target decreases. The faster the targets, the faster a new one should spawn. 
-		nextSpawnDelay = (1f / nextTarget.decaySpeed);
+		nextSpawnDelay = (1f / activeTarget.decaySpeed);
 	}
 }
 

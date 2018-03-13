@@ -141,11 +141,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41795f80d88814dca8ab443d92efb178, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TapTargetPrefab: {fileID: 1577991730951644, guid: 602a499679a794a2ca372dc32e26b4a4,
-    type: 2}
-  AccuracyIndicatorPrefab: {fileID: 1817892068543336, guid: 33b75dfaa4fb74f688f4bf5f063a7e60,
-    type: 2}
-  difficultyModifier: 0
 --- !u!4 &74082053
 Transform:
   m_ObjectHideFlags: 0
@@ -203,6 +198,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6404b9bf1b54040698dd34b1fc14bbfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TapTargetPrefab: {fileID: 1577991730951644, guid: 602a499679a794a2ca372dc32e26b4a4,
+    type: 2}
+  AccuracyIndicatorPrefab: {fileID: 1817892068543336, guid: 33b75dfaa4fb74f688f4bf5f063a7e60,
+    type: 2}
+  difficultyModifier: 0
   playerCharacterObject: {fileID: 190621620}
   enemyCharacterObject: {fileID: 1858205935}
 --- !u!4 &117663088

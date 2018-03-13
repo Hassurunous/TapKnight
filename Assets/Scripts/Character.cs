@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor.Animations;
 
 public class Character : MonoBehaviour {
 
@@ -94,8 +93,25 @@ public class Character : MonoBehaviour {
 		} else {
 			damageDealt = 1;
 		}
-		_hitpoints -= damageDealt;
+		_hitpoints = _hitpoints - damageDealt > 0 ? _hitpoints - damageDealt : 0;
+		animator.SetTrigger ("takeDamage");
+		animator.SetInteger ("currentHP", _hitpoints);
 		return damageDealt;
+	}
+
+	// Call this method when the character successfully attacks without taking damage.
+	public void Attack(float attackSpeed) {
+		Debug.Log ("attackSpeed = " + attackSpeed);
+		animator.SetFloat ("attackSpeed", attackSpeed);
+		animator.SetTrigger ("attack");
+	}
+
+	// Call this method when the character takes AND receives damage
+	public void AttackAndHurt(float attackSpeed) {
+		Debug.Log ("attackSpeed = " + attackSpeed);
+		animator.SetFloat ("attackSpeed", attackSpeed);
+		animator.SetTrigger ("attack");
+		animator.SetTrigger ("badAttack");
 	}
 
 
@@ -124,7 +140,6 @@ public class Character : MonoBehaviour {
 //		}
 //	}
 
-
 	// Call this method to update armor value of the character
 	public void UpdateArmor(int newArmor) {
 		_armor = newArmor;
@@ -147,7 +162,7 @@ public class Character : MonoBehaviour {
 	}
 
 	// Call this method to change the animator controller
-	public void UpdateAnimatorController(AnimatorController animController) {
+	public void UpdateAnimatorController(RuntimeAnimatorController animController) {
 		animatorController = animController;
 		animator.runtimeAnimatorController = animatorController;
 	}
