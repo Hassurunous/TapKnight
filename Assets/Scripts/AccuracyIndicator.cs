@@ -14,7 +14,7 @@ public class AccuracyIndicator : MonoBehaviour {
 			spriteRenderer.sprite = accuracySprites [1];
 		} else if (accuracy >= 75) {
 			spriteRenderer.sprite = accuracySprites [2];
-		} else if (accuracy >= 65) {
+		} else if (accuracy >= 55) {
 			spriteRenderer.sprite = accuracySprites [3];
 		} else {
 			spriteRenderer.sprite = accuracySprites [4];

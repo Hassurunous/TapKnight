@@ -129,7 +129,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   decaySpeed: 1
   TimerRing: {fileID: 1890223943652886}
+  timerRenderer: {fileID: 212640348421399210}
   TargetRing: {fileID: 1704484291955578}
+  delayTime: 0
 --- !u!212 &212640348421399210
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -162,10 +164,10 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -33256299
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: e02db79d4395d46eebd233e84d848b87, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.50980395}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.50980395}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -206,7 +208,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -33256299
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: e02db79d4395d46eebd233e84d848b87, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

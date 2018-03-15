@@ -23,6 +23,14 @@ public class Character : MonoBehaviour {
 	[SerializeField]
 	RuntimeAnimatorController animatorController;
 
+	// Sometimes we'll want to disable this object, such as in the endless mode we will disable it for the enemy.
+	[SerializeField]
+	GameObject hitpointObject;
+
+	// HP Bar is modified as the HP get lower, so we store a reference here for easy access.
+	[SerializeField]
+	GameObject hitpointBar;
+
 	// Private variables so other classes can't directly update the values here
 	// but public getters so that other classes can check them.
 
@@ -103,7 +111,7 @@ public class Character : MonoBehaviour {
 		animator.SetTrigger ("badAttack");
 	}
 
-	// Update the current hit points based on the amount of damage dealt
+	// Reduce the current hit points based on the amount of damage dealt
 	public void TakeDamage(bool attackToo, int damage, float attackSpeed = 1.0f) {
 		int damageDealt = 0;
 		if (damage > armor) {
@@ -119,6 +127,15 @@ public class Character : MonoBehaviour {
 		} else {
 			Hurt ();
 		}
+		UpdateHPBar ();
+	}
+
+	// Increase the current hit points by a value, up to a maximum of _hitpointsMax
+	public void GainHP(int percentage) {
+		int newHitpoints = _hitpoints + (int)(_hitpointsMax * (percentage/100f)) < _hitpointsMax ? _hitpoints + (int)(_hitpointsMax * (percentage/100f))  : _hitpointsMax;
+		_hitpoints = newHitpoints;
+		animator.SetInteger ("currentHP", newHitpoints);
+		UpdateHPBar ();
 	}
 		
 	// Call this method to update armor value of the character
@@ -134,6 +151,7 @@ public class Character : MonoBehaviour {
 	// Call this method to change the max hitpoints
 	public void UpdateMaxHP(int newMaxHP) {
 		_hitpointsMax = newMaxHP;
+		_hitpoints = _hitpointsMax;
 	}
 
 	// Call this method to change the sprite
@@ -162,8 +180,15 @@ public class Character : MonoBehaviour {
 		_enemy = character.enemy;
 	}
 
+	// Change the scale of the HP bar based on how much HP the character has
+	void UpdateHPBar() {
+		float hpScale = (_hitpoints / (float)hitpointsMax);
+		hitpointBar.transform.localScale = new Vector2 (hpScale, 1f);
+	}
+
 	// Set up the component given the values provided for sprite and animatorController
 	public void Setup() {
+		UpdateSprite (sprite);
 		animator.SetInteger ("currentHP", _hitpointsMax);
 	}
 		

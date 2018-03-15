@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
 
-	GameState currentGameState;
+	public GameState currentGameState;
 
 	// Track the player's current score. Useful depending on the game mode. For our initial MVP (infinite runner style) this will be the main user feedback.
 	public static int Score = 0;
@@ -14,6 +14,14 @@ public class GameController : MonoBehaviour {
 	public static GameController instance {
 		get {
 			return _instance;
+		}
+	}
+
+	void Update() {
+		switch (currentGameState) {
+		case GameState.Menu:
+//			CombatController
+			break;
 		}
 	}
 
