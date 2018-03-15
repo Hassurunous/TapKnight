@@ -13,6 +13,10 @@ public class TapTarget : MonoBehaviour {
 	// Reference for the TimerRing
 	public GameObject TimerRing;
 
+	// Timer Ring Sprite Renderer. Rather than look up every time, just store it initially.
+	[SerializeField]
+	SpriteRenderer timerRenderer;
+
 	// Reference for the TargetRing
 	public GameObject TargetRing;
 
@@ -24,12 +28,16 @@ public class TapTarget : MonoBehaviour {
 	float alignTime = 0.0f;
 	public float delayTime;
 
+	Color red = Color.red;
+	Color green = Color.green;
+
 	void Update()
 	{
 		// Scale the TimerRing down over time
 		if (tParam < 1) {
 			tParam += Time.deltaTime * decaySpeed; //This will increment tParam based on Time.deltaTime multiplied by a speed multiplier
 			timerRingScale = Mathf.Lerp (3f, 1f, tParam);
+			timerRenderer.color = Color.Lerp (red, green, tParam);
 			TimerRing.transform.localScale = new Vector3 (timerRingScale, timerRingScale, 1f);
 		} else if (aligned == false) {
 			alignTime = Time.time;

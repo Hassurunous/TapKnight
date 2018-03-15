@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapKnight", "Assembly-CSharp.csproj", "{3E0F0ED0-025E-EE2F-7C27-4D9713D601BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapKnight", "Assembly-CSharp-Editor.csproj", "{88B501ED-A7C2-FEA3-B093-DA9ADB35C4C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{3E0F0ED0-025E-EE2F-7C27-4D9713D601BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E0F0ED0-025E-EE2F-7C27-4D9713D601BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E0F0ED0-025E-EE2F-7C27-4D9713D601BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88B501ED-A7C2-FEA3-B093-DA9ADB35C4C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88B501ED-A7C2-FEA3-B093-DA9ADB35C4C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88B501ED-A7C2-FEA3-B093-DA9ADB35C4C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88B501ED-A7C2-FEA3-B093-DA9ADB35C4C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
