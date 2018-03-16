@@ -330,7 +330,7 @@ MonoBehaviour:
   inGameUI: {fileID: 1752429396}
   inGameScoreText: {fileID: 735136390}
   afterGameScoreText: {fileID: 1260772785}
-  difficultyModifier: 1
+  difficultyModifier: 2
   playerCharacterObject: {fileID: 190621620}
   enemyCharacterObject: {fileID: 1858205935}
 --- !u!4 &117663088

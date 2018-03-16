@@ -169,7 +169,7 @@ MonoBehaviour:
   _hitpointsMax: 10
   _hitpoints: 10
   _name: ork1
-  _attackPower: 1
+  _attackPower: 5
   _armor: 0
   _enemy: 1
 --- !u!114 &114953529260622418
