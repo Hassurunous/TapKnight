@@ -23,7 +23,13 @@ public class CombatController : MonoBehaviour {
 	GameObject readyScreen;
 
 	[SerializeField]
-	Text scoreText;
+	GameObject inGameUI;
+
+	[SerializeField]
+	Text inGameScoreText;
+
+	[SerializeField]
+	Text afterGameScoreText;
 
 	// Keep track of the active target
 	TapTarget activeTarget;
@@ -121,7 +127,7 @@ public class CombatController : MonoBehaviour {
 	}
 
 	void StartCombat() {
-		readyScreen.SetActive (false);
+		inGameUI.SetActive (true);
 		DisplayCharacters ();
 
 		nextSpawnDelay = Random.Range (1f / Mathf.Pow(2f, difficultyModifier), 5f / Mathf.Pow(2f, difficultyModifier));
@@ -139,6 +145,7 @@ public class CombatController : MonoBehaviour {
 
 	public void ReadyOrRetry() {
 		difficultyModifier = 1.0f;
+		GameController.Score = 0;
 		ClearUI ();
 		ClearCombatants ();
 		StartCombat ();
@@ -197,8 +204,9 @@ public class CombatController : MonoBehaviour {
 					IncreaseEnemyPower (enemyCharacter);
 				} else {
 					// Darn! You lost! Do things.
+					inGameUI.SetActive(false);
 					loseScreen.SetActive (true);
-					scoreText.text = "Score: " + GameController.Score;
+					afterGameScoreText.text = "Score: " + GameController.Score;
 					currState = CombatState.Ready;
 				}
 
@@ -265,6 +273,7 @@ public class CombatController : MonoBehaviour {
 
 		// Update the score. 
 		GameController.Score += damage;
+		inGameScoreText.text = "Score: " + GameController.Score;
 	}
 
 
