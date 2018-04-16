@@ -122,7 +122,6 @@ public class CombatController : MonoBehaviour {
 
 	}
 
-	// Currently, the only thing to do is start spawning targets. 
 	void Start () {
 	}
 
@@ -167,8 +166,9 @@ public class CombatController : MonoBehaviour {
 				SpawnTarget (currTime);
 			}
 
-			#if UNITY_EDITOR && !UNITY_IOS
+			#if UNITY_EDITOR
 			if (Input.GetButtonDown ("Fire1")) {
+                print("Fire1 pressed in editor.");
 				RaycastHit2D raycastHit = Physics2D.Raycast (Camera.main.ScreenToWorldPoint (Input.mousePosition), Vector2.zero);
 				if (raycastHit) {
 					if (raycastHit.collider.CompareTag ("TapTarget")) {
@@ -196,12 +196,10 @@ public class CombatController : MonoBehaviour {
 					Destroy (activeTarget.gameObject);
 				}
 				if (currState == CombatState.Victory) {
-					// Hooray! You won! Do things.
-//					winScreen.SetActive (true);
-					currState = CombatState.Active;
-					IncreaseDifficultyLevel();
-					StartCombat ();
-					IncreaseEnemyPower (enemyCharacter);
+                    // Hooray! You won! Do things.
+                    //					winScreen.SetActive (true);
+                    currState = CombatState.Active;
+                    StartCoroutine(EnemySpawnDelay());
 				} else {
 					// Darn! You lost! Do things.
 					inGameUI.SetActive(false);
@@ -326,6 +324,15 @@ public class CombatController : MonoBehaviour {
 		winScreen.SetActive (false);
 		readyScreen.SetActive (true);
 	}
+
+    IEnumerator EnemySpawnDelay() {
+        yield return new WaitForSeconds(2.0f);
+        Debug.Log("EnemySpawnDelay activated.");
+        IncreaseDifficultyLevel();
+        StartCombat();
+        IncreaseEnemyPower(enemyCharacter);
+        yield break;
+    }
 }
 
 enum CombatState {
