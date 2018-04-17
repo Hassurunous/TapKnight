@@ -198,7 +198,7 @@ public class CombatController : MonoBehaviour {
 				if (currState == CombatState.Victory) {
                     // Hooray! You won! Do things.
                     //					winScreen.SetActive (true);
-                    currState = CombatState.Active;
+                    currState = CombatState.Between;
                     StartCoroutine(EnemySpawnDelay());
 				} else {
 					// Darn! You lost! Do things.
@@ -328,9 +328,15 @@ public class CombatController : MonoBehaviour {
     IEnumerator EnemySpawnDelay() {
         yield return new WaitForSeconds(2.0f);
         Debug.Log("EnemySpawnDelay activated.");
+        currState = CombatState.Active;
         IncreaseDifficultyLevel();
         StartCombat();
         IncreaseEnemyPower(enemyCharacter);
+        yield break;
+    }
+
+    // TODO: move the enemy onto the screen and delay the target spawning until they make it to their space.
+    IEnumerator EnemyRunIn() {
         yield break;
     }
 }
@@ -339,7 +345,8 @@ enum CombatState {
 	Ready,
 	Active,
 	Victory,
-	Defeat
+	Defeat,
+    Between
 }
 
 enum GameType {
