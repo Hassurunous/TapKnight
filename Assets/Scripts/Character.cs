@@ -89,6 +89,37 @@ public class Character : MonoBehaviour {
 		}
 	}
 
+    //Storing the audio file references for easy callback in the gameplay.
+    [SerializeField]
+    private AudioClip hurtSound;
+
+    [SerializeField]
+    private AudioClip clashSound;
+
+    [SerializeField]
+    private AudioClip missSound;
+
+    [SerializeField]
+    private AudioClip deathSound;
+
+    [SerializeField]
+    private AudioClip perfectSound;
+
+    [SerializeField]
+    private AudioClip attackSound;
+    // TODO: Create logic for playing individual sounds. Diverge the "Player Character" from the "Enemy Character" class,
+    // so that we can eliminate unnecessary code. Possibly just need a setting to detect which it is, but it might be
+    // better to simply make another class.
+
+
+    //Having a separate audio source for the weapons and the character sounds means we can easily play the "miss" sound
+    // and also play the "hurt" sound. Might end up separating these in a different way later (perhaps a different source
+    // for each sound), but, for now, this is appropriate.
+    [SerializeField]
+    private AudioSource weaponSounds;
+
+    [SerializeField]
+    private AudioSource characterSounds;
 
 	// Methods for updating the values on the character. 
 
@@ -96,16 +127,60 @@ public class Character : MonoBehaviour {
 	// If the damage exceeds their armor, deal that much damage, otherwise deal 1 damage. Return how much damage was dealt.
 	public void Hurt() {
 		animator.SetTrigger ("takeDamage");
+        if (missSound)
+        {
+            weaponSounds.clip = missSound;
+            weaponSounds.Play();
+        }
+        if (hurtSound)
+        {
+            characterSounds.clip = hurtSound;
+            characterSounds.Play();
+        }
 	}
 
-	// Call this method when the character successfully attacks without taking damage.
+    // Call this method when the character gets a "Close!". "Close!" hits will deal no damage, and will instead count as a 
+    // clash, where both combatants have struck each other's weapon. Both characters will then recoil with the impact.
+    public void Clash(float attackSpeed) {
+        animator.SetTrigger("attack");
+        animator.SetFloat("attackSpeed", attackSpeed);
+        if (clashSound)
+        {
+            weaponSounds.clip = clashSound;
+            weaponSounds.Play();
+        }    
+    }
+
+
+	// Attack method triggers the appropriate animations and sounds. Optional clash parameter for "close" hits. 
 	public void Attack(float attackSpeed) {
 		animator.SetFloat ("attackSpeed", attackSpeed);
 		animator.SetTrigger ("attack");
-	}
+        if (attackSound)
+        {
+            weaponSounds.clip = attackSound;
+            weaponSounds.Play();
+        }
+    }
 
-	// Call this method when the character takes AND receives damage
-	public void AttackAndHurt(float attackSpeed) {
+    public void Attack(float attackSpeed, bool clash)
+    {
+        animator.SetFloat("attackSpeed", attackSpeed);
+        animator.SetTrigger("attack");
+        if (clashSound && clash)
+        {
+            weaponSounds.clip = clashSound;
+            weaponSounds.Play();
+        }
+        else if (attackSound)
+        {
+            weaponSounds.clip = attackSound;
+            weaponSounds.Play();
+        }
+    }
+
+    // Call this method when the character takes AND receives damage
+    private void AttackAndHurt(float attackSpeed) {
 		animator.SetFloat ("attackSpeed", attackSpeed);
 		animator.SetTrigger ("attack");
 		animator.SetTrigger ("badAttack");
@@ -127,6 +202,11 @@ public class Character : MonoBehaviour {
 		} else {
 			Hurt ();
 		}
+        if (animator.GetInteger("currentHP") <= 0)
+        {
+            characterSounds.clip = deathSound;
+            characterSounds.Play();
+        }
 		UpdateHPBar ();
 	}
 
@@ -136,6 +216,11 @@ public class Character : MonoBehaviour {
 		_hitpoints = newHitpoints;
 		animator.SetInteger ("currentHP", newHitpoints);
 		UpdateHPBar ();
+        if (perfectSound)
+        {
+            characterSounds.clip = perfectSound;
+            characterSounds.Play();
+        }
 	}
 		
 	// Call this method to update armor value of the character

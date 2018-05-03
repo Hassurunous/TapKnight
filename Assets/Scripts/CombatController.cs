@@ -260,10 +260,10 @@ public class CombatController : MonoBehaviour {
 			enemyCharacter.TakeDamage (false, damage);
 			playerCharacter.Attack (attackSpeedMod);
 		} else if (accuracy >= 55) {
-			damage = playerCharacter.attackPower / 2;
-			playerCharacter.TakeDamage (true, enemyCharacter.attackPower / 2, attackSpeedMod);
-			enemyCharacter.TakeDamage (true, damage, attackSpeedMod);
-		} else {
+            //damage = playerCharacter.attackPower / 2;
+            playerCharacter.Attack(attackSpeedMod, true);
+            enemyCharacter.Attack(attackSpeedMod);
+        } else {
 			playerCharacter.TakeDamage (false, enemyCharacter.attackPower);
 			enemyCharacter.Attack (attackSpeedMod);
 		}

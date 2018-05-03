@@ -4,6 +4,10 @@
 /[Bb]uild/
 /[Bb]uilds/
 /Assets/AssetStoreTools*
+<<<<<<< HEAD
+/TapKnight\ Development/
+=======
+>>>>>>> e9e43aa6ce226f60d10ee2ed92d40f2ad3fed682
 
 # Visual Studio 2015 cache directory
 /.vs/
