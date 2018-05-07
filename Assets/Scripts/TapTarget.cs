@@ -2,31 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TapTarget : MonoBehaviour {
-
-	// How fast will this target decay?
-	public float decaySpeed = 5.0f;
-
-	// How big is the outer ring (TimerRing) currently, compared to the size of the Target Ring
-	float timerRingScale = 3.0f;
+public class TapTarget : MonoBehaviour { 
 
 	// Reference for the TimerRing
-	public GameObject TimerRing;
+    [SerializeField]
+	GameObject TimerRing;
 
 	// Timer Ring Sprite Renderer. Rather than look up every time, just store it initially.
 	[SerializeField]
 	SpriteRenderer timerRenderer;
 
 	// Reference for the TargetRing
-	public GameObject TargetRing;
+    [SerializeField]
+	GameObject TargetRing;
 
-	// Interpolation parameter tells the percentage of the transformation that has taken place in the Lerp function
-	float tParam = 0f;
+    // How big is the outer ring (TimerRing) currently, compared to the size of the Target Ring
+    float timerRingScale = 3.0f;
+
+    // Interpolation parameter tells the percentage of the transformation that has taken place in the Lerp function
+    float tParam = 0f;
 
 	// We want to delay slightly after the rings align to destroy the ring to give users a bit of a chance to get the 100% click
 	bool aligned = false;
 	float alignTime = 0.0f;
-	public float delayTime;
+    float delayTime;
+
+    // TapTarget lifetime. Smaller number = faster target.
+    [SerializeField]
+    private float _lifetime = 0.0f;
+    public float lifetime
+    {
+        get
+        {
+            return _lifetime;
+        }
+    }
 
 	Color red = Color.red;
 	Color green = Color.green;
@@ -35,7 +45,7 @@ public class TapTarget : MonoBehaviour {
 	{
 		// Scale the TimerRing down over time
 		if (tParam < 1) {
-			tParam += Time.deltaTime * decaySpeed; //This will increment tParam based on Time.deltaTime multiplied by a speed multiplier
+            tParam += Time.deltaTime / _lifetime;//* decaySpeed; //This will increment tParam based on Time.deltaTime multiplied by a speed multiplier
 			timerRingScale = Mathf.Lerp (3f, 1f, tParam);
 			timerRenderer.color = Color.Lerp (red, green, tParam);
 			TimerRing.transform.localScale = new Vector3 (timerRingScale, timerRingScale, 1f);
@@ -43,7 +53,7 @@ public class TapTarget : MonoBehaviour {
 			alignTime = Time.time;
 			aligned = true;
 		} else if (aligned && Time.time >= alignTime + delayTime) {
-			CombatController.instance.TargetOutcome(this, false);
+			CombatController.Instance.TargetOutcome(this, false);
 		}
 
 	}
@@ -65,6 +75,13 @@ public class TapTarget : MonoBehaviour {
 	}
 
 	void Kill() {
-		Destroy (this.gameObject);
+        Destroy (this.gameObject);
 	}
+
+    public float TapTargetSetup(float newLifetime)
+    {
+        _lifetime = newLifetime;
+        delayTime = newLifetime * 0.05f;
+        return _lifetime + delayTime;
+    }
 }
