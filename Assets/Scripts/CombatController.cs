@@ -37,24 +37,14 @@ public class CombatController : MonoBehaviour {
     //[SerializeField]
     //AnimationCurve TapTargetDuration;
 
-	// Keep track of the active target
-	TapTarget activeTarget;
-
-
-	// Keep track of the last time we spawned a target
-	float lastSpawnTime = 0.0f;
-
-	// Delay between the death of current target and spawn of the next
-	float nextSpawnDelay;
-
-	// Position to spawn the next target. 
-	Vector3 nextSpawnPosition;
+    // True if it is time to spawn a new target; False if other targets are already being handled.
+    bool safeToSpawnTargets = false;
 
 	// What is the current difficulty rating? 
-	public float difficultyModifier = 1f;
+	public float difficultyModifier = 0f;
 
-	// This controls how fast the next target is. It is calculated in update for each target.
-	float activeTargetDecaySpeedMod = 1f;
+    // What is the current speed modifier (based on difficulty rating)
+    float speedModifier = 1.0f;
 
 	// Conditional statement in Update() checks time, so we'll store it in order to keep from needing to call it more than once. 
 	float currTime;
@@ -73,8 +63,11 @@ public class CombatController : MonoBehaviour {
 
 	Character enemyCharacter;
 
-	// We'll start in the "Ready" state, then switch to the "Active" state once the player presses "Ready".
-	CombatState currState = CombatState.Ready;
+    // Quick reference to active TapTargets, so we don't need to search for all of them every time.
+    List<GameObject> activeTargets = new List<GameObject>();
+
+    // We'll start in the "Ready" state, then switch to the "Active" state once the player presses "Ready".
+    CombatState currState = CombatState.Ready;
 
 	// For our initial tests, we're going to use an endless mode, then implement the map, upgrades...etc. later in the Progressive game mode.
 	GameType gameType = GameType.Endless;
@@ -131,12 +124,15 @@ public class CombatController : MonoBehaviour {
 	void Start () {
 	}
 
-	void StartCombat() {
+	IEnumerator StartCombat() {
 		inGameUI.SetActive (true);
 		DisplayCharacters ();
 
-		nextSpawnDelay = Random.Range (1f / Mathf.Pow(2f, difficultyModifier), 5f / Mathf.Pow(2f, difficultyModifier));
-		nextSpawnPosition = new Vector3 (Random.Range (-6f, 7f), Random.Range (-2.5f, 4.25f), 1f);
+        yield return new WaitForSeconds(3);
+
+        safeToSpawnTargets = true;
+
+        yield break;
 	}
 
 	void ClearCombatants() {
@@ -149,11 +145,12 @@ public class CombatController : MonoBehaviour {
 	}
 
 	public void ReadyOrRetry() {
-		difficultyModifier = 0.0f;
+        difficultyModifier = 0f;
+        UpdateSpeedModifier();
 		GameController.Score = 0;
 		ClearUI ();
 		ClearCombatants ();
-		StartCombat ();
+		StartCoroutine(StartCombat ());
 		currState = CombatState.Active;
 	}
 
@@ -163,13 +160,11 @@ public class CombatController : MonoBehaviour {
 		readyScreen.SetActive (false);
 	}
 
-	// 
 	void Update () {
 		if (currState == CombatState.Active) {
 			CheckForCombatEnd ();
-			currTime = Time.time;
-			if (currTime >= lastSpawnTime + nextSpawnDelay) {
-				SpawnTargets (currTime);
+			if (safeToSpawnTargets) {
+                StartCoroutine(SpawnTargets ());
 			}
 
 			#if UNITY_EDITOR
@@ -198,9 +193,7 @@ public class CombatController : MonoBehaviour {
 			#endif
 		} else if (gameType == GameType.Endless) {
 			if (currState == CombatState.Victory || currState == CombatState.Defeat) {
-				if (activeTarget != null) {
-					Destroy (activeTarget.gameObject);
-				}
+                DestroyAllTapTargets();
 				if (currState == CombatState.Victory) {
                     // Hooray! You won! Do things.
                     //					winScreen.SetActive (true);
@@ -217,9 +210,7 @@ public class CombatController : MonoBehaviour {
 			}
 		} else if (gameType == GameType.Progressive) {
 			if (currState == CombatState.Victory || currState == CombatState.Defeat) {
-				if (activeTarget != null) {
-					Destroy (activeTarget.gameObject);
-				}
+                DestroyAllTapTargets();
 				if (currState == CombatState.Victory) {
 					// Hooray! You won! Do things.
 					winScreen.SetActive(true);
@@ -243,11 +234,11 @@ public class CombatController : MonoBehaviour {
 		GameObject accuracyIndicatorScript = Instantiate(AccuracyIndicatorPrefab, target.transform.position, Quaternion.identity);
 		accuracyIndicatorScript.GetComponent<AccuracyIndicator> ().SpawnSetup (accuracy, destructDelay);
 
-		// Get the modifier for calculating animation speed.
-		float attackSpeedMod = activeTargetDecaySpeedMod + 1 < 3 ? activeTargetDecaySpeedMod + 1 : 3;
+        // Get the modifier for calculating animation speed.
+		float attackSpeedMod = speedModifier + 1 < 3 ? speedModifier + 1 : 3;
 
-		// Storing damage outside the if statements so we can update the Score after calculating. 
-		int damage = 0;
+        // Storing damage outside the if statements so we can update the Score after calculating. 
+        int damage = 0;
 
 		// Then run animations and other functions based on that accuracy.
 		// Player gains a small amount of HP back on perfect presses.
@@ -278,30 +269,77 @@ public class CombatController : MonoBehaviour {
 		// Update the score. 
 		GameController.Score += damage;
 		inGameScoreText.text = "Score: " + GameController.Score;
+
+        // Remove from activeTargets
+        activeTargets.Remove(target.gameObject);
 	}
 
 
-	void SpawnTargets(float nowtime, int amount=1) {
+    IEnumerator SpawnTargets(int amount = 1) {
 
-		// Update lastSpawnTime to match the currently spawning target
-		lastSpawnTime = nowtime;
+        safeToSpawnTargets = false;
 
-        // Scaling the decay speed logarithmically. Quick start to the curve, and a trailing increase that stays sane. 
-        activeTargetDecaySpeedMod = Mathf.Log((difficultyModifier + 1.5f), 2.5f);
+        // Set the lifetime of the new target(s)
+        float newLifetime = Random.Range(1.0f / (speedModifier * 2f), 1.0f / speedModifier);
+        float nextSpawnDelay = Random.Range(0.1f, 0.75f);
 
-        // Get the location to spawn the new target
-        nextSpawnPosition = new Vector3 (Random.Range (-6f, 7f), Random.Range (-2.5f, 3.25f), 1f);
+        // Store a list of lifetimes for the targets that we are going to instantiate
+        List<float> lifetimes = new List<float>();
 
-		// Instantiate a new target at the given location and get a reference to its TapTarget component
-		activeTarget = Instantiate (TapTargetPrefab, nextSpawnPosition, Quaternion.identity).GetComponent<TapTarget>();
+        // Store a list of delays to use in the spawning process
+        List<float> delays = new List<float>();
 
-        // Set the lifetime of the new target and returns the full lifetime with included delay for target alignment (See: TapTarget.cs for more about delayTime)
-        float newLifetime = Random.Range(1.0f / (activeTargetDecaySpeedMod * 2f), 1.0f / activeTargetDecaySpeedMod);
-        nextSpawnDelay =  activeTarget.TapTargetSetup(newLifetime);
+        for (int targets = 0; targets < amount; targets++)
+        {
+            // create `amount` lifetimes and store them so we can calculate and instantiate targets
+
+            // calculate the spawn delay for the next target in the chain and store that in the delays list
+
+            // Get the location to spawn the new target
+            Vector3 nextSpawnPosition = new Vector3(Random.Range(-6f, 7f), Random.Range(-2.5f, 3.25f), 1f);
+
+            // Set the layer order of the new target to prevent targets from being double-pressed
+
+            // Instantiate a new target at the given location and get a reference to its TapTarget component
+            GameObject newTarget = Instantiate(TapTargetPrefab, nextSpawnPosition, Quaternion.identity);
+            activeTargets.Add(newTarget);
+
+            // Assign the lifetime to the new target. Log error if this fails for any reason.
+            try
+            {
+                activeTargets[activeTargets.Count - 1].GetComponent<TapTarget>().TapTargetSetup(newLifetime);
+            }
+            catch
+            {
+                Debug.LogError("TapTarget component not found in activeTargets[targets] object.");
+            }
+
+            yield return new WaitForSeconds(nextSpawnDelay);
+        }
+
+        while (activeTargets.Count > 0)
+        {
+            yield return null;
+        }
+
+        safeToSpawnTargets = true;
+
+        yield break;
 	}
 
-	void IncreaseDifficultyLevel() {
+    void DestroyAllTapTargets()
+    {
+        GameObject[] tapTargets = GameObject.FindGameObjectsWithTag("TapTarget");
+
+        for (var i = 0; i < tapTargets.Length; i++)
+        {
+            Destroy(tapTargets[i]);
+        }
+    }
+
+    void IncreaseDifficultyLevel() {
 		difficultyModifier += 0.1f;
+        UpdateSpeedModifier();
 	}
 
 	// Increase the power of the enemy based on the difficultyModifier
@@ -319,6 +357,12 @@ public class CombatController : MonoBehaviour {
 		enemy.UpdateMaxHP(newHP);
 	}
 
+    void UpdateSpeedModifier()
+    {
+        // Scaling the speed logarithmically. Quick start to the curve, and a trailing increase that stays sane. 
+        speedModifier = Mathf.Log((difficultyModifier + 1.5f), 2.5f);
+    }
+
 	public void MainMenu() {
 		ClearCombatants ();
 		GameController.instance.currentGameState = GameState.Menu;
@@ -332,7 +376,7 @@ public class CombatController : MonoBehaviour {
         Debug.Log("EnemySpawnDelay activated.");
         currState = CombatState.Active;
         IncreaseDifficultyLevel();
-        StartCombat();
+        StartCoroutine(StartCombat());
         IncreaseEnemyPower(enemyCharacter);
         yield break;
     }
