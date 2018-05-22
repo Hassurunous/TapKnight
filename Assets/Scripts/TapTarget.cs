@@ -78,10 +78,9 @@ public class TapTarget : MonoBehaviour {
         Destroy (this.gameObject);
 	}
 
-    public float TapTargetSetup(float newLifetime)
+    public void TapTargetSetup(float newLifetime)
     {
         _lifetime = newLifetime;
         delayTime = newLifetime * 0.05f;
-        return _lifetime + delayTime;
     }
 }
