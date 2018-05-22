@@ -19,10 +19,10 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4914925001096214}
-  - component: {fileID: 114402810435819228}
   - component: {fileID: 58633873770452274}
+  - component: {fileID: 114299328910269054}
   m_Layer: 0
-  m_Name: TapTarget
+  m_Name: TapTarget New
   m_TagString: TapTarget
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -93,7 +93,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1577991730951644}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -4.8308954, y: 1.0670649, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4756242774004658}
@@ -116,7 +116,7 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 1
---- !u!114 &114402810435819228
+--- !u!114 &114299328910269054
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -124,14 +124,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1577991730951644}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c522202e871c3484389cfb5564d0643c, type: 3}
+  m_Script: {fileID: 11500000, guid: cb9916deb935e764ba24f847210a0348, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  decaySpeed: 1
   TimerRing: {fileID: 1890223943652886}
   timerRenderer: {fileID: 212640348421399210}
   TargetRing: {fileID: 1704484291955578}
-  delayTime: 0
+  _lifetime: 5
 --- !u!212 &212640348421399210
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -145,6 +144,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
@@ -189,6 +189,7 @@ SpriteRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:

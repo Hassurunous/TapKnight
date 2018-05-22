@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class TapTargetEventManager : MonoBehaviour {
 
-
-
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 		
 	}
 	
@@ -20,6 +18,11 @@ public class TapTargetEventManager : MonoBehaviour {
 
     public delegate void TapAction(Vector3 position, float accuracy);
     public static event TapAction OnTapped;
+
+    public static void TapTargetCall(Vector3 position, float accuracy)
+    {
+        OnTapped(position, accuracy);
+    }
 
     #endregion
 }
