@@ -31,6 +31,12 @@ public class CombatController : MonoBehaviour {
 	[SerializeField]
 	Text afterGameScoreText;
 
+    // TODO: Animation curve could be used to manage the difficulty without resorting to 
+    // creating a complex equation by hand. 
+    // Using animation curves to control tap target duration
+    //[SerializeField]
+    //AnimationCurve TapTargetDuration;
+
 	// Keep track of the active target
 	TapTarget activeTarget;
 
@@ -74,20 +80,20 @@ public class CombatController : MonoBehaviour {
 	GameType gameType = GameType.Endless;
 
 	// Singleton initialization of GameController static
-	private static CombatController _instance = null;
-	public static CombatController instance {
+	private static CombatController _Instance = null;
+	public static CombatController Instance {
 		get {
-			return _instance;
+			return _Instance;
 		}
 	}
 
 	void Awake()
 	{
 		//Check if instance already exists
-		if (_instance == null) {
+		if (_Instance == null) {
 			//if not, set instance to this
-			_instance = this;
-		} else if (_instance != this) {
+			_Instance = this;
+		} else if (_Instance != this) {
 			Destroy (this.gameObject);
 		}
 	}
@@ -143,7 +149,7 @@ public class CombatController : MonoBehaviour {
 	}
 
 	public void ReadyOrRetry() {
-		difficultyModifier = 1.0f;
+		difficultyModifier = 0.0f;
 		GameController.Score = 0;
 		ClearUI ();
 		ClearCombatants ();
@@ -163,7 +169,7 @@ public class CombatController : MonoBehaviour {
 			CheckForCombatEnd ();
 			currTime = Time.time;
 			if (currTime >= lastSpawnTime + nextSpawnDelay) {
-				SpawnTarget (currTime);
+				SpawnTargets (currTime);
 			}
 
 			#if UNITY_EDITOR
@@ -231,7 +237,7 @@ public class CombatController : MonoBehaviour {
 
 	public void TargetOutcome(TapTarget target, bool hit) {
 		int accuracy = target.Accuracy(hit); // Calculate how accurate the tap was based on the size of the TimerRing
-		float destructDelay = target.decaySpeed <= 2 ? target.decaySpeed : 0.5f;
+		float destructDelay = Mathf.Clamp(target.lifetime, 0.5f, 1.5f);
 
 		// Spawn the indicator text that shows the player how accurate they were with their tap.
 		GameObject accuracyIndicatorScript = Instantiate(AccuracyIndicatorPrefab, target.transform.position, Quaternion.identity);
@@ -275,27 +281,23 @@ public class CombatController : MonoBehaviour {
 	}
 
 
-	void SpawnTarget(float nowtime) {
-		// Scaling the decay speed logarithmically. Quick start to the curve, and a trailing increase that stays sane. 
-		activeTargetDecaySpeedMod = Mathf.Log(difficultyModifier, 4);
+	void SpawnTargets(float nowtime, int amount=1) {
 
 		// Update lastSpawnTime to match the currently spawning target
 		lastSpawnTime = nowtime;
 
-		// Get the location to spawn the new target
-		nextSpawnPosition = new Vector3 (Random.Range (-6f, 7f), Random.Range (-2.5f, 4f), 1f);
+        // Scaling the decay speed logarithmically. Quick start to the curve, and a trailing increase that stays sane. 
+        activeTargetDecaySpeedMod = Mathf.Log((difficultyModifier + 1.5f), 2.5f);
+
+        // Get the location to spawn the new target
+        nextSpawnPosition = new Vector3 (Random.Range (-6f, 7f), Random.Range (-2.5f, 3.25f), 1f);
 
 		// Instantiate a new target at the given location and get a reference to its TapTarget component
 		activeTarget = Instantiate (TapTargetPrefab, nextSpawnPosition, Quaternion.identity).GetComponent<TapTarget>();
 
-		// Set the speed of the new target
-		activeTarget.decaySpeed = Random.Range (activeTargetDecaySpeedMod + 0.5f, activeTargetDecaySpeedMod + 1.2f);
-
-		// Set the length of the pause on overlap before destruction.
-		activeTarget.delayTime = 0.05f / activeTarget.decaySpeed;
-
-		// As decaySpeed scales upward, the lifetime of a target decreases. The faster the targets, the faster a new one should spawn. 
-		nextSpawnDelay = (1f / activeTarget.decaySpeed);
+        // Set the lifetime of the new target and returns the full lifetime with included delay for target alignment (See: TapTarget.cs for more about delayTime)
+        float newLifetime = Random.Range(1.0f / (activeTargetDecaySpeedMod * 2f), 1.0f / activeTargetDecaySpeedMod);
+        nextSpawnDelay =  activeTarget.TapTargetSetup(newLifetime);
 	}
 
 	void IncreaseDifficultyLevel() {

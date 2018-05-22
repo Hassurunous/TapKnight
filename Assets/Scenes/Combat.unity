@@ -426,7 +426,7 @@ MonoBehaviour:
   inGameUI: {fileID: 1752429396}
   inGameScoreText: {fileID: 735136390}
   afterGameScoreText: {fileID: 1260772785}
-  difficultyModifier: 2
+  difficultyModifier: 4
   playerCharacterObject: {fileID: 190621620}
   enemyCharacterObject: {fileID: 1858205935}
 --- !u!4 &117663088
@@ -1062,8 +1062,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 5.8, y: -65}
-  m_SizeDelta: {x: -478.4, y: 80}
+  m_AnchoredPosition: {x: 20.965, y: -44.2}
+  m_SizeDelta: {x: -508.72998, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &735136390
 MonoBehaviour:
@@ -1097,7 +1097,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'SCORE : '
+  m_Text: 'SCORE: 0'
 --- !u!222 &735136391
 CanvasRenderer:
   m_ObjectHideFlags: 0
